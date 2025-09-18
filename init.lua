@@ -98,11 +98,24 @@ vim.g.have_nerd_font = false
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
--- Make line numbers default
-vim.opt.number = true
+--  Break tab into spaces
+vim.opt.expandtab = true
+
+--  Take indent from previous line
+vim.opt.autoindent = true
+
+-- Make it so tab takes two spaces
+vim.opt.tabstop = 2
+
+-- Don't know if this works
+-- vim.opt.smartindent = true
+
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
+
+-- Make line numbers default
+vim.opt.number = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -114,9 +127,9 @@ vim.opt.showmode = false
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
+-- vim.schedule(function()
+-- vim.opt.clipboard = 'unnamedplus'
+-- end)
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -154,7 +167,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 5
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -163,6 +176,20 @@ vim.opt.confirm = true
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
+--
+--  Map "jk" to escape
+vim.keymap.set('i', 'jk', '<ESC>')
+
+--  Make it so grouping symbols type out their ending as well
+-- vim.keymap.set('i', '{', '{}<LEFT>')
+-- vim.keymap.set('i', '[', '[]<LEFT>')
+-- vim.keymap.set('i', '(', '()<LEFT>')
+
+-- In normal mode, <SPACE>e brings up the details of an error in a floating window
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+
+-- disable eslint for the current line
+vim.keymap.set('n', '<leader>r', 'A// eslint-disable-line<ESC>', { desc = 'Disable eslint in current line (,js)' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -210,7 +237,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
@@ -276,6 +303,16 @@ require('lazy').setup({
     },
   },
 
+  { --Markview - markdown viewer thing
+    --  'OXY2DEV/markview.nvim',
+    --  lazy = false,
+
+    -- For blink.cmp's completion
+    -- source
+    -- dependencies = {
+    --     "saghen/blink.cmp"
+    -- },
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -667,7 +704,12 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
+        --hie = {},
+        clangd = {},
+        hls = {},
+        -- ada_ls = {},
+
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -676,6 +718,16 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+
+        --eslint = {},
+        --oxlint_ls = {},
+        quick_lint_js = {
+          settings = {
+            indent = false,
+          },
+        },
+
+        jsonls = {},
 
         lua_ls = {
           -- cmd = { ... },
@@ -723,6 +775,7 @@ require('lazy').setup({
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
+            --require('lspconfig').eslint.setup {}
           end,
         },
       }
@@ -826,10 +879,10 @@ require('lazy').setup({
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+          -- Select the [p]ext item
+          ['<C-p>'] = cmp.mapping.select_next_item(),
+          -- Select the [o]revious item
+          ['<C-o>'] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -906,7 +959,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'iceberg'
     end,
   },
 
